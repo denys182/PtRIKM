@@ -24,13 +24,19 @@ pipeline {
             }
         }
         stage('Deploy') {
-            steps {
-                
-                sh '''
-                docker run -d -p 80:80 --name my-app-container my-app:latest
-                '''
-            }
-        }
+    steps {
+        sh '''
+        # Перевірка та видалення контейнера, якщо він існує
+        if [ "$(docker ps -aq -f name=my-app-container)" ]; then
+            docker stop my-app-container
+            docker rm my-app-container
+        fi
+        # Розгортання нового контейнера
+        docker run -d -p 80:80 --name my-app-container my-app:latest
+        '''
+    }
+}
+
     }
 
     post {
